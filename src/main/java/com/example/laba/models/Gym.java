@@ -1,4 +1,10 @@
 package com.example.laba.models;
 
-public record Gym( Long id, Long Trainer_id, String name, Integer salary ) {
-}
+import java.util.Date;
+
+public record Gym(
+        Long Id,
+        String Club_Name,
+        Long trainerId
+
+) {}
