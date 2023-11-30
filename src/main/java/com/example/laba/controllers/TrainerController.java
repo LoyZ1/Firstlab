@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 
 @RestController
@@ -44,7 +45,7 @@ public class TrainerController {
     @GetMapping("/{trainerId}")
     public Trainer getTrainer(@PathVariable("trainerId") Long trainerId) {
         return trainers.stream()
-                .filter(trainer -> trainer.Id() == trainerId)
+                .filter(trainer -> Objects.equals(trainer.id(), trainerId))
                 .findAny()
                 .orElse(null);
     }

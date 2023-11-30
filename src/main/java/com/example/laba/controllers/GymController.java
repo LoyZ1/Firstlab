@@ -11,7 +11,6 @@ import java.util.List;
 @RequestMapping("api/gyms")
 public class GymController {
 
-
     private final List<Gym> gymList;
 
     public GymController() {
@@ -19,17 +18,16 @@ public class GymController {
                 1L)));
 
     }
+
     @GetMapping
     public List<Gym> getGym() {
         return gymList;
     }
 
-
-
-    @GetMapping("/{GymId}")
-    public Gym getGym(@PathVariable("GymId") Long GymId) {
+    @GetMapping("/{gymId}")
+    public Gym getGym(@PathVariable("gymId") Long GymId) {
         return gymList.stream()
-                .filter(trainer -> trainer.Id() == GymId)
+                .filter(trainer -> trainer.id() == GymId)
                 .findAny()
                 .orElse(null);
     }
@@ -39,8 +37,7 @@ public class GymController {
     }
 
     @PostMapping("/add/{gymId}")
-    public void createGym(@PathVariable("gymId") Long gymId,
-                                           @RequestBody Gym gym) {
+    public void createGym(@PathVariable("gymId") Long gymId, @RequestBody Gym gym) {
         if (gym != null) {
             gymList.add(gym);
         }
