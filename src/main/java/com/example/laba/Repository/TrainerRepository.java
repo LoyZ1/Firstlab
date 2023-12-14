@@ -10,4 +10,8 @@ public interface TrainerRepository {
     List<Trainer> readAll();
 
     void create(Trainer trainer);
+
+    void updateTrainer(Trainer trainer, Integer trainerId);
+
+    void deleteTrainer(Integer trainerId);
 }

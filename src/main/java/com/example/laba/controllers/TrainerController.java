@@ -1,74 +1,60 @@
 package com.example.laba.controllers;
 
+import com.example.laba.Repository.TrainerRepository;
+import com.example.laba.exception.NotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.laba.models.Trainer;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.List;
-import java.util.Objects;
 
 
 @RestController
 
 @RequestMapping("api/trainers")
 public class TrainerController {
-    private final List<Trainer> trainers;
+    private final TrainerRepository trainerRepository;
 
-    public TrainerController(List<Trainer> trainerList) {
 
-        try {
-            String strDate1 = "14.10.2003";
-            String strDate2 = "28.02.2003";
-            DateFormat formatter = new SimpleDateFormat("dd.MM.yyyy");
-            Date date1 = formatter.parse(strDate1);
-            Date date2 = formatter.parse(strDate2);
-
-            Trainer n1 = new Trainer(1L,"Alex","Nemkov","Anatolyevich",
-                    true, date1, 45000);
-            Trainer n2 = new Trainer(2L,"Danil","Maslov","Borisovich",
-                    true, date2, 34000);
-
-            trainers = new ArrayList<>(List.of(n1,n2));
-        } catch (ParseException e) {
-            throw new RuntimeException(e);
-        }
+    @Autowired
+    public TrainerController(TrainerRepository trainerRepository) {
+        this.trainerRepository = trainerRepository;
 
     }
     @GetMapping
     public List<Trainer> getTrainers() {
-        return trainers;
+        return trainerRepository.readAll();
     }
 
     @GetMapping("/{trainerId}")
     public Trainer getTrainer(@PathVariable("trainerId") Long trainerId) {
-        return trainers.stream()
-                .filter(trainer -> Objects.equals(trainer.id(), trainerId))
-                .findAny()
-                .orElse(null);
+       return trainerRepository.read(trainerId);
     }
 
-    @DeleteMapping("/{trainerId}")
-    public void deleteTrainer(@PathVariable("trainerId") Long trainerId) {
-        trainers.remove(getTrainer(trainerId));
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public void create(@RequestBody Trainer trainer) {
+        trainerRepository.create(trainer);
     }
 
-    @PostMapping("add/{trainerId}")
-    public Trainer addTrainer(@RequestBody Trainer newTrainers) {
-        trainers.add(newTrainers);
-        return newTrainers;
-    }
-
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("/{trainerId}")
-    public void putTrainer(@PathVariable("trainerId") Long trainerId, @RequestBody Trainer newTrainers) {
-        trainers.remove(getTrainer(trainerId));
-        if (newTrainers != null) {
-            trainers.add(newTrainers);
-
-        }
+    public void updateTrainer(@RequestBody Trainer trainer, @PathVariable("trainerId") int trainerId) {
+        trainerRepository.updateTrainer(trainer, trainerId);
     }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{trainerId}")
+    public void deleteMember(@PathVariable("trainerId") int trainerId) {
+        trainerRepository.deleteTrainer(trainerId);
+    }
+
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<?> handleException(NotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
 }
 
 

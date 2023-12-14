@@ -1,6 +1,6 @@
 package com.example.laba.Repository;
 
-import com.example.laba.NotFoundException;
+import com.example.laba.exception.NotFoundException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -21,6 +21,18 @@ public class TrainerRepositoryH2 implements TrainerRepository {
     private static final String CREATE = """
                         insert into trainers (id, name, surname, patronymic, gender, birth, salary)
                         values (:id, :name, :surname, :patronymic, :gender, :birth, :salary)
+            """;
+
+    private static final String UPDATE = """
+            UPDATE trainers SET
+                        ID = id,
+                        NAME = :name,
+                        SURNAME = :surname,
+                        PATRONYMIC = :patronymic,
+                        GENDER = :gender,
+                        BIRTH = :birth,
+                        SALARY = :salary
+                        WHERE ID = :id
             """;
 
     private final RowMapper<Trainer> rowMapper = new DataClassRowMapper<>(Trainer.class);
@@ -53,5 +65,17 @@ public class TrainerRepositoryH2 implements TrainerRepository {
     public void create(Trainer trainer) {
         BeanPropertySqlParameterSource paramsSource = new BeanPropertySqlParameterSource(trainer);
         namedParameterJdbcTemplate.update(CREATE, paramsSource);
+    }
+
+    @Override
+    public void updateTrainer(Trainer trainer, Integer trainerId){
+        BeanPropertySqlParameterSource paramsSource = new BeanPropertySqlParameterSource(trainer);
+        namedParameterJdbcTemplate.update(UPDATE, paramsSource);
+
+    }
+
+    @Override
+    public void deleteTrainer(Integer trainerId){
+        jdbcTemplate.update("DELETE FROM TRAINERS WHERE Id = ?", trainerId);
     }
 }

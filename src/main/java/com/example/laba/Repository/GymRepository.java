@@ -8,5 +8,9 @@ public interface GymRepository {
 
     List<Gym> readAll();
 
-    void Create(Gym gym);
+    void createGym(Gym gym);
+
+    void updateGym(Gym gym, Integer gymId);
+
+    void deleteGym(Integer gymId);
 }

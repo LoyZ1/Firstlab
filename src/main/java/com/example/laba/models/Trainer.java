@@ -5,7 +5,7 @@ public record Trainer(Long id,
                       String name,
                       String surname,
                       String patronymic,
-                      Boolean gender,
+                      boolean gender,
                       Date birth,
                       Integer salary)
 

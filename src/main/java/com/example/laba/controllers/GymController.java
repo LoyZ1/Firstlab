@@ -1,9 +1,14 @@
 package com.example.laba.controllers;
 
+import com.example.laba.Repository.GymRepository;
+import com.example.laba.exception.NotFoundException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.example.laba.models.Gym;
 
-import java.util.ArrayList;
+
 import java.util.List;
 
 
@@ -11,44 +16,43 @@ import java.util.List;
 @RequestMapping("api/gyms")
 public class GymController {
 
-    private final List<Gym> gymList;
+    private final GymRepository gymRepository;
 
-    public GymController() {
-        gymList = new ArrayList<>(List.of(new Gym(1L, "GreenGoril",
-                1L)));
 
+    @Autowired
+    public GymController(GymRepository gymRepository) {
+        this.gymRepository = gymRepository;
     }
 
     @GetMapping
     public List<Gym> getGym() {
-        return gymList;
+        return gymRepository.readAll();
     }
 
     @GetMapping("/{gymId}")
-    public Gym getGym(@PathVariable("gymId") Long GymId) {
-        return gymList.stream()
-                .filter(trainer -> trainer.id() == GymId)
-                .findAny()
-                .orElse(null);
-    }
-    @DeleteMapping("/{gymId}")
-    public void deleteGym(@PathVariable("gymId") Long gymId) {
-        gymList.remove(getGym(gymId));
+    public Gym getGym(@PathVariable("gymId") Long gymId) {
+        return gymRepository.read(gymId);
     }
 
-    @PostMapping("/add/{gymId}")
-    public void createGym(@PathVariable("gymId") Long gymId, @RequestBody Gym gym) {
-        if (gym != null) {
-            gymList.add(gym);
-        }
+    @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
+    public void Create(@RequestBody Gym gym) {
+        gymRepository.createGym(gym);
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     @PutMapping("/{gymId}")
-    public void putGym(@PathVariable("gymId") Long gymId, @RequestBody Gym newgyms) {
-        gymList.remove(getGym(gymId));
+    public void updateGym(@RequestBody Gym gym, @PathVariable("gymId") int gymId) {
+        gymRepository.updateGym(gym, gymId);
+    }
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/{gymId}")
+    public void deleteGym(@PathVariable("gymId") int gymId) {
+        gymRepository.deleteGym(gymId);
+    }
 
-        if (newgyms != null) {
-            gymList.add(newgyms);
-        }
+    @ExceptionHandler(NotFoundException.class)
+    public ResponseEntity<?> handleException(NotFoundException e) {
+        return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
     }
 }
